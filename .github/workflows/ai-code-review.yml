@@ -1,0 +1,74 @@
+name: AI-Powered Code Review
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  ai-security-scan:
+    runs-on: ubuntu-latest
+    name: Security & Quality Analysis
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    # AI Tool 1: Bandit (Security issues)
+    - name: Run Bandit Security Scan
+      run: |
+        bandit -r src/ -f json -o bandit-report.json || true
+        bandit -r src/ -f txt
+
+    # AI Tool 2: Pylint (Code quality)
+    - name: Run Pylint
+      run: |
+        pylint src/ --output-format=text || true
+
+    # AI Tool 3: Safety (Dependency vulnerabilities)
+    - name: Check Dependencies with Safety
+      run: |
+        safety check --json || true
+
+    # AI Tool 4: CodeQL (Advanced security analysis)
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: python
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+
+    # Upload reports as artifacts
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+
+  code-formatting:
+    runs-on: ubuntu-latest
+    name: Code Formatting Check
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Black
+      run: pip install black
+
+    - name: Check code formatting
+      run: black --check src/
