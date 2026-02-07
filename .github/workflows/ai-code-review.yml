@@ -24,23 +24,26 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    # AI Tool 1: Bandit (Security issues)
+    # DevSecOps Tool 1: Bandit (Security issues)
     - name: Run Bandit Security Scan
+      continue-on-error: true
       run: |
-        bandit -r src/ -f json -o bandit-report.json || true
+        bandit -r src/ -f json -o bandit-report.json
         bandit -r src/ -f txt
 
-    # AI Tool 2: Pylint (Code quality)
+    # DevSecOps Tool 2: Pylint (Code quality)
     - name: Run Pylint
+      continue-on-error: true
       run: |
-        pylint src/ --output-format=text || true
+        pylint src/ --output-format=text
 
-    # AI Tool 3: Safety (Dependency vulnerabilities)
+    # DevSecOps Tool 3: Safety (Dependency vulnerabilities)
     - name: Check Dependencies with Safety
+      continue-on-error: true
       run: |
-        safety check --json || true
+        safety check --json
 
-    # AI Tool 4: CodeQL (Advanced security analysis)
+    # DevSecOps Tool 4: CodeQL (Advanced security analysis)
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
