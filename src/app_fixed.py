@@ -2,6 +2,7 @@
 Fixed Flask Application - AI-assisted improvements
 All security vulnerabilities and code smells resolved
 """
+
 from flask import Flask, request, render_template_string, jsonify
 import sqlite3
 import os
@@ -11,21 +12,23 @@ import logging
 app = Flask(__name__)
 
 # FIX 1: Use environment variables for secrets
-DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
-API_KEY = os.getenv('API_KEY')
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+API_KEY = os.getenv("API_KEY")
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def get_db_connection():
     """Get database connection with proper configuration"""
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect("users.db")
     conn.row_factory = sqlite3.Row
     return conn
 
+
 # FIX 2: Parameterized queries prevent SQL injection
-@app.route('/user/<username>')
+@app.route("/user/<username>")
 def get_user(username):
     try:
         conn = get_db_connection()
@@ -42,12 +45,13 @@ def get_user(username):
         logger.error(f"Error fetching user: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+
 # FIX 3: Input validation and error handling
-@app.route('/calculate', methods=['POST'])
+@app.route("/calculate", methods=["POST"])
 def calculate():
     try:
-        num1 = float(request.form.get('num1', 0))
-        num2 = float(request.form.get('num2', 1))
+        num1 = float(request.form.get("num1", 0))
+        num2 = float(request.form.get("num2", 1))
 
         if num2 == 0:
             return jsonify({"error": "Division by zero not allowed"}), 400
@@ -60,16 +64,18 @@ def calculate():
         logger.error(f"Calculation error: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+
 # FIX 4: Proper HTML escaping
-@app.route('/greet')
+@app.route("/greet")
 def greet():
-    name = request.args.get('name', 'Guest')
+    name = request.args.get("name", "Guest")
     # Using Jinja2 auto-escaping
     template = "<h1>Hello {{ name|e }}!</h1>"
     return render_template_string(template, name=name)
 
+
 # FIX 5: Optimized query - single JOIN instead of N+1
-@app.route('/orders')
+@app.route("/orders")
 def get_orders():
     try:
         conn = get_db_connection()
@@ -88,19 +94,20 @@ def get_orders():
         logger.error(f"Error fetching orders: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+
 # FIX 6: Path validation and error handling
-@app.route('/file/<filename>')
+@app.route("/file/<filename>")
 def read_file(filename):
     # Whitelist approach for file access
-    allowed_files = ['readme.txt', 'info.txt']
+    allowed_files = ["readme.txt", "info.txt"]
 
     if filename not in allowed_files:
         return jsonify({"error": "File not allowed"}), 403
 
     try:
         # Use safe path joining
-        safe_path = os.path.join('/data', os.path.basename(filename))
-        with open(safe_path, 'r') as f:
+        safe_path = os.path.join("/data", os.path.basename(filename))
+        with open(safe_path, "r") as f:
             content = f.read()
         return content
     except FileNotFoundError:
@@ -109,12 +116,14 @@ def read_file(filename):
         logger.error(f"Error reading file: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
-@app.route('/health')
+
+@app.route("/health")
 def health():
     """Health check endpoint"""
     return jsonify({"status": "healthy"}), 200
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # FIX 7: Production-ready configuration
-    debug_mode = os.getenv('FLASK_ENV') == 'development'
-    app.run(debug=debug_mode, host='127.0.0.1', port=5000)
+    debug_mode = os.getenv("FLASK_ENV") == "development"
+    app.run(debug=debug_mode, host="127.0.0.1", port=5000)
