@@ -56,6 +56,23 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
 
+    # DevSecOps Tool 5: Snyk (Container & dependency scanning)
+    - name: Run Snyk Security Scan
+      continue-on-error: true
+      uses: snyk/actions/python@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=medium
+
+    # DevSecOps Tool 6: SonarCloud (Code quality & security)
+    - name: SonarCloud Scan
+      continue-on-error: true
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
     # Upload reports as artifacts
     - name: Upload Security Reports
       uses: actions/upload-artifact@v4

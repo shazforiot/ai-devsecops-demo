@@ -74,13 +74,40 @@ python src/app_fixed.py
 | Test Coverage | 0% | 85% | +85% |
 | Review Time | 2 hours | 15 min | 87% faster |
 
-## 🛠️ AI Tools Used
+## 🛠️ DevSecOps Tools Used
 
-- **Bandit** - Python security linting
-- **Pylint** - Code quality analysis
-- **Safety** - Dependency vulnerability checking
-- **CodeQL** - Semantic code analysis
-- **Black** - Code formatting
+### Automated Security Scanning:
+1. **Bandit** - Python security linting (FREE)
+2. **Pylint** - Code quality analysis (FREE)
+3. **Safety** - Dependency vulnerability checking (FREE)
+4. **CodeQL** - Semantic code analysis (FREE for public repos)
+5. **Snyk** - Container & dependency scanning (FREE tier available)
+6. **SonarCloud** - Code quality & security gates (FREE for public repos)
+7. **Black** - Code formatting (FREE)
+
+## ⚙️ GitHub Actions Setup
+
+### Required Secrets (Optional Tools)
+
+The workflow includes Snyk and SonarCloud which require API tokens. To enable them:
+
+#### 1. Snyk Setup (Optional)
+1. Sign up at https://snyk.io
+2. Get your API token from Account Settings
+3. Add to GitHub: Settings → Secrets and variables → Actions → New repository secret
+   - Name: `SNYK_TOKEN`
+   - Value: Your Snyk API token
+
+#### 2. SonarCloud Setup (Optional)
+1. Sign up at https://sonarcloud.io
+2. Create a new organization and project
+3. Generate a token from My Account → Security
+4. Update `sonar-project.properties` with your project key and organization
+5. Add to GitHub: Settings → Secrets and variables → Actions → New repository secret
+   - Name: `SONAR_TOKEN`
+   - Value: Your SonarCloud token
+
+**Note:** The workflow uses `continue-on-error: true` for Snyk and SonarCloud, so they won't fail the build if tokens are not configured.
 
 ## 📝 License
 
